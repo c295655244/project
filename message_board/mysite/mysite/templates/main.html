@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title%}
+    留言板
+{% endblock%}
+{% block content %}
+{% load url from future %}
+<div>
+    <h1 align="center"> 留言板 </h1>
+    <div align="right">
+    <font  size="3"  color="Orange" >
+        <a href="/mains/"> {{request.user.username}}</a> |
+        <a href="/mains/"> 首页 </a> |
+        <a href="/accounts/login/"> 登录 </a> |
+        <a href="/mains/post/"> 发表新帖 </a>|
+        <a href="/mains/password/change/"> 修改密码 </a> |
+        <a href="/mains/logout/"> 退出 </a>|
+        <a href="/mains/register/"> 注册 </a>|
+        <a href="/admin/"> admin </a>
+    </font>
+    </div>
+</div>
+    {% for post in posts %}
+
+        <h2  >{{ post.title }}      <div style="float:right;"><font  size="3"  >By    {{ post.user }} </font></div>       </h2>
+
+        <!-- <h2  ><a href="/detail/{{ post.title }}/"> {{ post.title }} </a>     <div style="float:right;"><font  size="3"  >By   <a href="/detail/{{ post.user }}/"> {{ post.user }} </a> </font></div>       </h2> -->
+        <p>{{ post.datetime }}</p>
+        <br>
+        <p><font  size="3"   >{{ post.content }} </font></p>
+        <hr />
+    {% endfor %}
+    {% if is_paginated %}
+        <table>
+            <tr>
+                {% if has_previous %}
+                <td><a href="?page={{ previous }}">&lt;&lt; 上一页 </a></td>
+                {% endif %}
+                {% if has_next %}
+                <td><a href="?page={{ next }}"> 下 一 页 &gt;&gt;</a></td>
+                {% endif %}
+                <td> 第 {{ page }} 页,共 {{ pages }} 页 </td>
+                <form action="." method="get">
+                <td>&nbsp;&nbsp; 到第 </td>
+                <td><input name="page" type="text" size="2"></td>
+                <td> 页 </td>
+                <td><input type="submit" value=" 跳转 "></td>
+            </tr>
+        </table>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+C:\Users\ChenHua\AppData\Local\Temporary Projects\Chatting\bin\Debug\Chatting.exe
+C:\Users\ChenHua\AppData\Local\Temporary Projects\Chatting\bin\Debug\Chatting.pdb
+C:\Users\ChenHua\AppData\Local\Temporary Projects\Chatting\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\ChenHua\AppData\Local\Temporary Projects\Chatting\obj\Debug\Chatting.Properties.Resources.resources
+C:\Users\ChenHua\AppData\Local\Temporary Projects\Chatting\obj\Debug\Chatting.csproj.GenerateResource.Cache
+C:\Users\ChenHua\AppData\Local\Temporary Projects\Chatting\obj\Debug\Chatting.exe
+C:\Users\ChenHua\AppData\Local\Temporary Projects\Chatting\obj\Debug\Chatting.pdb
+C:\Users\ChenHua\AppData\Local\Temporary Projects\Chatting\obj\Debug\Chatting.formMain.resources
+Q:\Chatting\Chatting\Chatting\obj\Debug\Chatting.exe
+Q:\Chatting\Chatting\Chatting\obj\Debug\Chatting.pdb
+Q:\Chatting\Chatting\Chatting\bin\Debug\Chatting.exe
+Q:\Chatting\Chatting\Chatting\bin\Debug\Chatting.pdb
+Q:\Chatting\Chatting\Chatting\obj\Debug\ResolveAssemblyReference.cache
+Q:\Chatting\Chatting\Chatting\obj\Debug\Chatting.Properties.Resources.resources
+Q:\Chatting\Chatting\Chatting\obj\Debug\Chatting.MainForm.resources
+Q:\Chatting\Chatting\Chatting\obj\Debug\GenerateResource-ResGen.read.1.tlog
+Q:\Chatting\Chatting\Chatting\obj\Debug\GenerateResource-ResGen.write.1.tlog
+C:\Users\Chen Hua\Desktop\Chatting\Chatting\obj\Debug\Chatting.exe
+C:\Users\Chen Hua\Desktop\Chatting\Chatting\obj\Debug\Chatting.pdb

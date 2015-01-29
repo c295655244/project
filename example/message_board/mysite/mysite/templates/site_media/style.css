@@ -1,0 +1,7 @@
+
+
+dssiv.nav{float:right}
+table.msglist{border:3 solid black; border-collapse:collapse}
+table.msglist th,table.msglist td{border:2 solid black}
+input {display:block; border:1 solid black}
+table.noframe, table.noframe td{border:0}

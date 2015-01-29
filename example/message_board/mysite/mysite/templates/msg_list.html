@@ -1,0 +1,40 @@
+<tr align="center">
+<th> 主题 </th><th> 留言人 </th>
+<th>IP 地址 </th><th> 留言时间 </th><th> 点击数 </th>
+<th> 评论数 </th>
+</tr>
+
+{% if msg_list %}
+
+{% load comments %}
+
+{% for msg in msg_list %}
+<tr align="center">
+<td align="left">
+
+<a href="/detail/{{msg.id}}/">
+
+{{msg.title}}
+</a>
+</td>
+
+<td ><a href = "/user/{{msg.user.username}}/" >{{ msg.
+user.username }}</a></td>
+
+<td>{{msg.ip}}</td>
+
+<td>{{msg.datetime|date:"Y-m-d H:i"}}</td>
+
+<td>{{msg.clickcount}}</td>
+
+<td >{% get_comment_count for messageboard.msg
+msg.id as comment_count %}
+
+{{comment_count}}
+</td>
+</tr>
+{% endfor %}
+{% else %}
+<tr align="center"><td colspan="8"> 目 前 还 没 有 留 言 信 息 !
+</td></tr>
+{% endif %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}
+注册
+{% endblock%}
+{% block content %}
+<a href="/mains/"> 首页 </a> | <a href="/mains/login/"> 登录 </a> |
+<div>
+    <h2>用户注册</h2>
+    <form method="post" action=".">
+        {{ form.as_p }}{% csrf_token %}
+        <input type="submit" value="注册" />   
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        
+    </form>
+</div>
+{% endblock %}

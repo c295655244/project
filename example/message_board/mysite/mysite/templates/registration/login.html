@@ -1,0 +1,30 @@
+
+{% extends "base.html" %}
+{% block title %} 用户登录 {% endblock %}
+{% block head %} 用户登录 {% endblock %}
+{% block content %}
+{% if form.has_errors %}
+<ul class="errorlist"><li> 您输入的用户名 或 密 码 错 误 ! 请 重
+新输入。 </li></ul>
+{% endif %}
+<form method="post" action=".">
+<table class="noframe">
+<tr>
+<td align="right"> 用户名 :</td>
+<td>{{form.username}}</td>
+</tr>
+<tr>
+<td align="right"> 密码 :</td>
+<td>{{form.password}}</td>
+<td><a href="/accounts/password/reset/"> 忘 了 密 码 </a>
+<input type="hidden" name="next" value="{{next}}">
+</td>
+</tr>
+<tr>
+<td colspan="2" align="center">
+<input type="submit" value=" 登录 ">
+</td>
+</tr>
+</table>
+</form>
+{% endblock %}
